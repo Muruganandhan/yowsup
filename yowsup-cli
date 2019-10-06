@@ -579,6 +579,9 @@ class DemosArgParser(YowArgParser):
                                    help="Specify where to download incoming media files, if not set "
                                         "will download to a temporary directory.")
 
+        presenseOpts = self.add_argument_group("Presense Change")
+        presenseOpts.add_argument('-p', '--presense', action="store_true", help="Presense change,")
+
         logging = self.add_argument_group("Logging options")
         logging.add_argument("--log-dissononce", action="store_true", help="Configure logging for dissononce/noise")
         logging.add_argument("--log-consonance", action="store_true", help="Configure logging for consonance")
@@ -612,6 +615,8 @@ class DemosArgParser(YowArgParser):
             self.startSyncContacts()
         elif self.args["mediasink"]:
             self.startMediaSink(self.args["media_store_dir"])
+        elif self.args["presense"]:
+            self.startPresense()
         else:
             return False
         return True
@@ -637,6 +642,19 @@ class DemosArgParser(YowArgParser):
         try:
             self.printInfoText()
             stack = echoclient.YowsupEchoStack(self._profile)
+            if self._layer_network_dispatcher is not None:
+                stack.set_prop(YowNetworkLayer.PROP_DISPATCHER, self._layer_network_dispatcher)
+            stack.start()
+        except KeyboardInterrupt:
+            print("\nYowsdown")
+            sys.exit(0)
+
+    def startPresense(self):
+        self._ensure_config_props()
+        from yowsup.demos import presence
+        try:
+            self.printInfoText()
+            stack = presence.YowsupPresenseStack(self._profile)
             if self._layer_network_dispatcher is not None:
                 stack.set_prop(YowNetworkLayer.PROP_DISPATCHER, self._layer_network_dispatcher)
             stack.start()

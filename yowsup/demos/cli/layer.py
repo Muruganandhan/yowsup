@@ -436,7 +436,8 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
     def onPresenceChange(self, entity):
         status="offline"
         if entity.getType() is None:
-            status="online"     
+            status="online"
+            lastseen = time.time()
         ##raw fix for iphone lastseen deny output
         lastseen = entity.getLast()
         if status is "offline" and lastseen is "deny":
